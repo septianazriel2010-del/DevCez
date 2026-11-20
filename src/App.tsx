@@ -16,6 +16,7 @@ import {
   Monitor,
   Network,
   RefreshCw,
+  Rocket,
   Server,
   Settings,
   ShieldCheck,
@@ -24,10 +25,17 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import MetricCard from "./components/MetricCard";
-import { getSystemSnapshot } from "./lib/tauri";
+import ProjectManager from "./components/ProjectManager";
+import WorkspaceManager from "./components/WorkspaceManager";
+import LocalServerManager from "./components/LocalServerManager";
+import RuntimeInspector from "./components/RuntimeInspector";
+import QuickLaunch from "./components/QuickLaunch";
+import NetworkSpeedTest from "./components/NetworkSpeedTest";
+import { getNetworkOverview, getSystemSnapshot } from "./lib/tauri";
 import type { SystemSnapshot } from "./types/system";
+import type { NetworkOverview } from "./types/network";
 
-type PageId = "dashboard" | "network" | "diagnostics" | "projects" | "workspace" | "servers" | "system" | "utilities" | "settings";
+type PageId = "dashboard" | "quick_launch" | "network" | "diagnostics" | "projects" | "workspace" | "servers" | "system" | "utilities" | "settings";
 
 interface NavItem {
   id: PageId;
@@ -37,19 +45,22 @@ interface NavItem {
 }
 
 const navigation: { title: string; items: NavItem[] }[] = [
-  { title: "OVERVIEW", items: [{ id: "dashboard", label: "Dashboard", icon: LayoutDashboard }] },
+  { title: "OVERVIEW", items: [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "quick_launch", label: "Quick Launch", icon: Rocket, tag: "NEW" },
+  ] },
   {
     title: "NETWORK INTELLIGENCE",
     items: [
-      { id: "network", label: "Network monitor", icon: Network, tag: "PHASE 2" },
+      { id: "network", label: "Network monitor", icon: Network },
       { id: "diagnostics", label: "Diagnostics", icon: Gauge, tag: "PHASE 2" },
     ],
   },
   {
     title: "DEVELOPER WORKSPACE",
     items: [
-      { id: "projects", label: "My projects", icon: FolderKanban, tag: "PHASE 3" },
-      { id: "workspace", label: "Workspace", icon: Code2, tag: "PHASE 3" },
+      { id: "projects", label: "My projects", icon: FolderKanban },
+      { id: "workspace", label: "Workspace", icon: Code2 },
       { id: "servers", label: "Local servers", icon: Server, tag: "PHASE 3" },
     ],
   },
@@ -57,7 +68,7 @@ const navigation: { title: string; items: NavItem[] }[] = [
     title: "SYSTEM & TOOLS",
     items: [
       { id: "system", label: "System resources", icon: Monitor },
-      { id: "utilities", label: "Developer tools", icon: TerminalSquare, tag: "LATER" },
+      { id: "utilities", label: "Runtime inspector", icon: TerminalSquare, tag: "PHASE 3" },
     ],
   },
 ];
@@ -67,6 +78,11 @@ const pageTitles: Record<PageId, { eyebrow: string; title: string; description: 
     eyebrow: "OVERVIEW / DASHBOARD",
     title: "Your workspace, in control.",
     description: "A clear view of your machine and the tools you use to build.",
+  },
+  quick_launch: {
+    eyebrow: "DEVELOPER WORKSPACE",
+    title: "Quick Launch",
+    description: "Open registered projects, workspaces, and development tools from one place.",
   },
   network: {
     eyebrow: "NETWORK INTELLIGENCE",
@@ -81,12 +97,12 @@ const pageTitles: Record<PageId, { eyebrow: string; title: string; description: 
   projects: {
     eyebrow: "DEVELOPER WORKSPACE",
     title: "My projects",
-    description: "Keep your development folders organized and ready to launch.",
+    description: "Register existing project folders, identify their types, and open them in Explorer.",
   },
   workspace: {
     eyebrow: "DEVELOPER WORKSPACE",
     title: "Workspace manager",
-    description: "Create focused setups for coding, study, and personal projects.",
+    description: "Group registered projects into focused workspaces and set your active workspace.",
   },
   servers: {
     eyebrow: "DEVELOPER WORKSPACE",
@@ -100,8 +116,8 @@ const pageTitles: Record<PageId, { eyebrow: string; title: string; description: 
   },
   utilities: {
     eyebrow: "SYSTEM & TOOLS",
-    title: "Developer tools",
-    description: "A compact toolkit for common development tasks.",
+    title: "Runtime inspector",
+    description: "Check installed runtimes, package managers, and development tools on this Windows device.",
   },
   settings: {
     eyebrow: "PREFERENCES",
@@ -285,7 +301,7 @@ function Dashboard({ snapshot, backendError, lastUpdated, onRefresh, refreshing,
           </div>
           <div className="feature-copy">
             <strong>Understand your connection.</strong>
-            <p>Ping analysis, DNS inspection, and network interface monitoring are planned for the next build phase.</p>
+            <p>Interface discovery, adapter status, address information, DNS servers, and gateways are available locally.</p>
           </div>
           <button className="text-action" onClick={() => onNavigate("network")} type="button">Explore module <ArrowRight size={15} /></button>
         </article>
@@ -300,13 +316,13 @@ function Dashboard({ snapshot, backendError, lastUpdated, onRefresh, refreshing,
             </div>
             <span className="coming-soon-pill purple-pill">PHASE 3</span>
           </div>
-          <p className="panel-paragraph">Your projects, local servers, and development workflows will live in one focused workspace.</p>
+          <p className="panel-paragraph">Organize registered projects into focused workspaces and manage local development servers from one place.</p>
           <div className="developer-feature-row">
-            <div className="dev-feature"><div className="dev-feature-icon"><FolderKanban size={17} /></div><span>Project launcher</span></div>
-            <div className="dev-feature"><div className="dev-feature-icon"><TerminalSquare size={17} /></div><span>Command center</span></div>
+            <div className="dev-feature"><div className="dev-feature-icon"><FolderKanban size={17} /></div><span>Project manager</span></div>
+            <div className="dev-feature"><div className="dev-feature-icon"><Code2 size={17} /></div><span>Workspace manager</span></div>
             <div className="dev-feature"><div className="dev-feature-icon"><Server size={17} /></div><span>Local servers</span></div>
           </div>
-          <button className="text-action" onClick={() => onNavigate("projects")} type="button">View developer workspace <ArrowRight size={15} /></button>
+          <button className="text-action" onClick={() => onNavigate("workspace")} type="button">Open workspace manager <ArrowRight size={15} /></button>
         </article>
         <article className="panel quick-panel">
           <div className="panel-heading">
@@ -322,6 +338,146 @@ function Dashboard({ snapshot, backendError, lastUpdated, onRefresh, refreshing,
         </article>
       </section>
     </>
+  );
+}
+
+function NetworkMonitor() {
+  const [overview, setOverview] = useState<NetworkOverview | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const refreshNetwork = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getNetworkOverview();
+      setOverview(result);
+      setLastUpdated(new Date());
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Windows network discovery did not respond.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshNetwork();
+  }, [refreshNetwork]);
+
+  return (
+    <section className="network-monitor-page">
+      <div className="network-summary-row">
+        <div className="network-summary-card panel">
+          <div className="section-kicker">ADAPTERS</div>
+          <strong>{overview ? overview.interfaces.length : "—"}</strong>
+          <span>{overview ? "Detected interfaces" : "Waiting for discovery"}</span>
+        </div>
+        <div className="network-summary-card panel">
+          <div className="section-kicker">CONNECTION STATUS</div>
+          <strong>{overview ? overview.connected_interface_count : "—"}</strong>
+          <span>{overview?.connected_interface_count === 1 ? "Adapter operational" : "Adapters operational"}</span>
+        </div>
+        <div className="network-summary-card panel">
+          <div className="section-kicker">DEFAULT GATEWAYS</div>
+          <strong>{overview ? overview.default_gateways.length : "—"}</strong>
+          <span>{overview?.default_gateways.length === 1 ? "Gateway detected" : "Gateways detected"}</span>
+        </div>
+        <div className="network-summary-actions">
+          <span className="sync-time">Updated {formatTime(lastUpdated)}</span>
+          <button className="primary-button network-refresh" onClick={() => void refreshNetwork()} disabled={loading} type="button">
+            <RefreshCw size={15} className={loading ? "spin" : ""} />
+            {loading ? "Discovering…" : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      <NetworkSpeedTest />
+
+      {error && (
+        <div className="notice notice-warning">
+          <CircleHelp size={17} />
+          <div>
+            <strong>Network information unavailable</strong>
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
+
+      {loading && !overview && (
+        <div className="panel network-loading">
+          <RefreshCw size={18} className="spin" />
+          <span>Discovering Windows network interfaces…</span>
+        </div>
+      )}
+
+      {!loading && overview?.interfaces.length === 0 && (
+        <div className="panel network-empty">
+          <Network size={24} />
+          <strong>No network interfaces were reported</strong>
+          <span>Windows did not return any adapter information.</span>
+        </div>
+      )}
+
+      {overview?.interfaces.map((networkInterface) => (
+        <article className="panel network-interface-card" key={`${networkInterface.adapter_id}-${networkInterface.name}`}>
+          <div className="network-interface-header">
+            <div className="network-interface-title">
+              <div className={`network-status-icon ${networkInterface.is_up ? "up" : "down"}`}>
+                <Wifi size={20} />
+              </div>
+              <div>
+                <h2>{networkInterface.name}</h2>
+                <span>{networkInterface.description}</span>
+              </div>
+            </div>
+            <span className={`network-status-pill ${networkInterface.is_up ? "up" : "down"}`}>
+              <span />
+              {networkInterface.status}
+            </span>
+          </div>
+
+          <div className="network-interface-status">
+            <span>{networkInterface.status_detail}</span>
+            {networkInterface.mtu !== null && <span>MTU {networkInterface.mtu}</span>}
+          </div>
+
+          <div className="network-detail-grid">
+            <div className="network-detail-section">
+              <div className="section-kicker">ADAPTER</div>
+              <dl>
+                <dt>Friendly name</dt>
+                <dd>{networkInterface.name}</dd>
+                <dt>Adapter ID</dt>
+                <dd>{networkInterface.adapter_id}</dd>
+                <dt>MAC address</dt>
+                <dd>{networkInterface.mac_address ?? "Unavailable"}</dd>
+              </dl>
+            </div>
+
+            <AddressList title="IPv4 addresses" values={networkInterface.ipv4_addresses} />
+            <AddressList title="IPv6 addresses" values={networkInterface.ipv6_addresses} />
+            <AddressList title="DNS servers" values={networkInterface.dns_servers} />
+            <AddressList title="Default gateways" values={networkInterface.gateways} />
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+function AddressList({ title, values }: { title: string; values: string[] }) {
+  return (
+    <div className="network-detail-section">
+      <div className="section-kicker">{title}</div>
+      {values.length > 0 ? (
+        <div className="address-list">
+          {values.map((value, index) => <code key={`${value}-${index}`}>{value}</code>)}
+        </div>
+      ) : (
+        <span className="network-unavailable">Unavailable</span>
+      )}
+    </div>
   );
 }
 
@@ -393,6 +549,18 @@ export default function App() {
               refreshing={refreshing}
               onNavigate={setActivePage}
             />
+          ) : activePage === "network" ? (
+            <NetworkMonitor />
+          ) : activePage === "quick_launch" ? (
+            <QuickLaunch />
+          ) : activePage === "projects" ? (
+            <ProjectManager />
+          ) : activePage === "workspace" ? (
+            <WorkspaceManager />
+          ) : activePage === "servers" ? (
+            <LocalServerManager />
+          ) : activePage === "utilities" ? (
+            <RuntimeInspector />
           ) : (
             <ModulePlaceholder page={activePage} onBack={() => setActivePage("dashboard")} />
           )}

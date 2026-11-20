@@ -9,3 +9,16 @@ export interface SystemSnapshot {
   memory_usage: number;
   logical_cores: number;
 }
+
+export type RuntimeToolCategory = "runtime" | "development_tool";
+export type RuntimeToolStatus = "installed" | "not_installed" | "unavailable";
+
+export interface RuntimeTool {
+  id: string;
+  name: string;
+  category: RuntimeToolCategory;
+  status: RuntimeToolStatus;
+  version: string | null;
+  executable_path: string | null;
+  details: string | null;
+}
