@@ -41,6 +41,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::system::get_system_snapshot,
             commands::network::get_network_overview,
+            commands::ports::get_port_overview,
             commands::speed_test::start_speed_test,
             commands::speed_test::stop_speed_test,
             commands::projects::get_projects,

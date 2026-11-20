@@ -496,6 +496,73 @@ h1, h2, p { margin-top: 0; }
 .server-log-line > b { color: #72b8f1; font-weight: 600; }
 .server-log-line.stderr > b { color: #d59b83; }
 .server-log-line > code { white-space: pre-wrap; overflow-wrap: anywhere; }
+.port-intelligence-page { display: flex; flex-direction: column; gap: 12px; }
+.port-overview-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.port-overview-card { min-height: 100px; padding: 14px 15px; display: flex; flex-direction: column; }
+.port-overview-card strong { margin-top: 11px; color: #edf4fc; font-size: 25px; line-height: 1; font-variant-numeric: tabular-nums; }
+.port-overview-card > span { margin-top: 8px; color: #7f8fa2; font-size: 8px; }
+.port-toolbar { padding: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.port-search { min-width: 220px; min-height: 34px; padding: 0 9px; display: flex; align-items: center; gap: 8px; flex: 1 1 260px; color: #718197; background: #141a23; border: 1px solid var(--border-strong); border-radius: 6px; }
+.port-search:focus-within { border-color: rgba(101,173,255,.55); }
+.port-search input { width: 100%; color: #dce6f2; background: transparent; border: 0; outline: 0; font: inherit; font-size: 9px; }
+.port-search input::placeholder { color: #68788c; }
+.port-toolbar select { min-height: 34px; min-width: 112px; padding: 0 8px; color: #9cabbc; background: #141a23; border: 1px solid var(--border-strong); border-radius: 6px; font: inherit; font-size: 8px; }
+.port-refresh { min-height: 34px; padding: 0 11px; }
+.port-refresh-meta { display: flex; justify-content: space-between; gap: 10px; color: #718197; font-size: 8px; }
+.port-refresh-meta > span:first-child { display: inline-flex; align-items: center; gap: 7px; }
+.port-error { align-items: center; }
+.port-error > div { flex: 1; }
+.port-empty { min-height: 128px; display: flex; align-items: center; justify-content: center; gap: 9px; color: #8292a5; font-size: 10px; }
+.port-empty strong { color: #cbd6e3; font-size: 10px; }
+.port-empty span { color: #7f8fa2; font-size: 8px; }
+.port-workspace { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(250px, .75fr); align-items: start; gap: 11px; }
+.port-table-panel { min-width: 0; overflow: hidden; }
+.port-table-heading { min-height: 53px; padding: 10px 13px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+.port-table-heading strong { display: block; margin-top: 5px; color: #dce6f2; font-size: 11px; }
+.port-table-heading strong span { color: #718197; font-size: 8px; font-weight: 450; }
+.port-table-scroll { max-height: 570px; overflow: auto; }
+.port-table { width: max-content; min-width: 1060px; border-collapse: collapse; text-align: left; }
+.port-table th { position: sticky; top: 0; z-index: 1; padding: 9px 10px; color: #718197; background: #171d26; font-size: 7px; font-weight: 750; letter-spacing: .45px; text-transform: uppercase; white-space: nowrap; }
+.port-table td { max-width: 180px; padding: 9px 10px; color: #aab8c8; border-top: 1px solid rgba(43,51,64,.55); font-size: 8px; }
+.port-table th:nth-child(1), .port-table td:nth-child(1) { min-width: 72px; }
+.port-table th:nth-child(2), .port-table td:nth-child(2),
+.port-table th:nth-child(4), .port-table td:nth-child(4) { min-width: 140px; }
+.port-table th:nth-child(3), .port-table td:nth-child(3),
+.port-table th:nth-child(5), .port-table td:nth-child(5) { min-width: 82px; }
+.port-table th:nth-child(6), .port-table td:nth-child(6) { min-width: 92px; }
+.port-table th:nth-child(7), .port-table td:nth-child(7) { min-width: 120px; }
+.port-table th:nth-child(8), .port-table td:nth-child(8) { min-width: 58px; }
+.port-table tbody tr { cursor: pointer; outline: none; }
+.port-table tbody tr:hover, .port-table tbody tr:focus-visible { background: rgba(94,159,230,.055); }
+.port-table tbody tr.selected { background: rgba(74,158,255,.085); }
+.port-table td code { display: block; max-width: 180px; color: #b7c8da; font-family: "Cascadia Mono", Consolas, monospace; font-size: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.port-protocol { display: inline-flex; padding: 4px 6px; border-radius: 4px; font-size: 7px; font-weight: 800; }
+.port-protocol.tcp { color: #8bc4ff; background: rgba(74,158,255,.1); }
+.port-protocol.udp { color: #b6a5ff; background: rgba(139,130,246,.11); }
+.port-table td .port-number { min-width: 48px; padding: 4px 7px; display: inline-flex; justify-content: center; color: #e2efff; background: rgba(74,158,255,.13); border: 1px solid rgba(101,173,255,.2); border-radius: 5px; font-family: "Cascadia Mono", Consolas, monospace; font-size: 9px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.port-table td .port-number.unavailable { color: #627186; background: rgba(255,255,255,.02); border-color: var(--border); }
+.port-state { color: #8493a5; font-family: "Cascadia Mono", Consolas, monospace; font-size: 7px; white-space: nowrap; }
+.port-state.listening { color: #70cba6; }
+.port-state.established { color: #8bc4ff; }
+.port-process-name { display: block; overflow: hidden; color: #c2cedb; text-overflow: ellipsis; white-space: nowrap; }
+.port-process-name.unavailable { color: #d4a47f; font-size: 7px; }
+.port-pid { font-family: "Cascadia Mono", Consolas, monospace; font-variant-numeric: tabular-nums; }
+.port-filter-empty { min-height: 95px; display: grid; place-items: center; color: #8292a5; font-size: 9px; }
+.port-details { position: sticky; top: 12px; padding: 13px; display: flex; flex-direction: column; gap: 13px; }
+.port-details-heading { display: flex; justify-content: space-between; align-items: flex-start; }
+.port-details-heading h2 { margin: 5px 0 0; color: #e1eaf4; font-size: 14px; }
+.port-kind-badge { width: fit-content; padding: 5px 8px; color: #8bc4ff; background: rgba(74,158,255,.08); border: 1px solid rgba(101,173,255,.16); border-radius: 5px; font-size: 8px; }
+.port-kind-badge.udp { color: #b6a5ff; background: rgba(139,130,246,.08); border-color: rgba(161,140,255,.16); }
+.port-detail-group { display: flex; flex-direction: column; gap: 8px; padding-bottom: 11px; border-bottom: 1px solid var(--border); }
+.port-detail-value { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.port-detail-value > span { color: #718197; font-size: 7px; }
+.port-detail-value > div { min-width: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 5px; }
+.port-detail-value code { color: #b8c5d4; font-family: "Cascadia Mono", Consolas, monospace; font-size: 8px; line-height: 1.5; overflow-wrap: anywhere; }
+.port-detail-value button { flex: 0 0 auto; padding: 3px; color: #8292a5; background: transparent; border: 0; cursor: pointer; }
+.port-detail-value button:hover { color: #8bc4ff; }
+.port-detail-note { margin: 0; color: #718197; font-size: 7px; line-height: 1.5; }
+.port-copy-feedback { color: #70cba6; font-size: 8px; }
+.port-empty-detail { padding: 18px 0; color: #8292a5; font-size: 9px; }
 
 @media (max-width: 1180px) {
   .sidebar { width: 225px; min-width: 225px; }
@@ -508,6 +575,9 @@ h1, h2, p { margin-top: 0; }
   .network-detail-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .server-launch-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .server-workspace { grid-template-columns: minmax(180px, .75fr) minmax(0, 1.5fr); }
+  .port-workspace { grid-template-columns: 1fr; }
+  .port-details { position: static; }
+  .port-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 850px) {
   .sidebar { width: 70px; min-width: 70px; padding: 22px 10px 15px; }
@@ -557,6 +627,13 @@ h1, h2, p { margin-top: 0; }
   .network-interface-status { align-items: flex-start; flex-direction: column; }
   .network-detail-grid { grid-template-columns: 1fr; }
   .network-speed-test { padding: 15px 13px; }
+  .port-toolbar { align-items: stretch; }
+  .port-search { flex-basis: 100%; }
+  .port-toolbar select { flex: 1 1 42%; min-width: 0; }
+  .port-refresh { flex: 1 1 auto; justify-content: center; }
+  .port-refresh-meta { flex-direction: column; }
+  .port-table-scroll { max-height: 440px; }
+  .port-table th, .port-table td { padding: 8px 7px; }
   .projects-toolbar { align-items: flex-start; flex-direction: column; }
   .project-card { align-items: stretch; flex-direction: column; gap: 14px; }
   .project-card-actions { justify-content: flex-end; }

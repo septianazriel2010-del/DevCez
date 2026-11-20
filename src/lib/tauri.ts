@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { RuntimeTool, SystemSnapshot } from "../types/system";
 import type { NetworkOverview } from "../types/network";
+import type { PortEndpoint } from "../types/ports";
 import type { Project } from "../types/project";
 import type { WorkspaceOverview } from "../types/workspace";
 import type { LocalServer, ServerProfile } from "../types/server";
@@ -61,6 +62,10 @@ export function launchQuickTool(toolId: string, url: string | null = null): Prom
 /** Requests the Windows network adapter overview from the Rust backend. */
 export function getNetworkOverview(): Promise<NetworkOverview> {
   return invoke<NetworkOverview>("get_network_overview");
+}
+
+export function getPortOverview(): Promise<PortEndpoint[]> {
+  return invoke<PortEndpoint[]>("get_port_overview");
 }
 
 export function startSpeedTest(): Promise<string> {

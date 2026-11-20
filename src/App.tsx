@@ -15,6 +15,7 @@ import {
   MemoryStick,
   Monitor,
   Network,
+  Radio,
   RefreshCw,
   Rocket,
   Server,
@@ -31,11 +32,12 @@ import LocalServerManager from "./components/LocalServerManager";
 import RuntimeInspector from "./components/RuntimeInspector";
 import QuickLaunch from "./components/QuickLaunch";
 import NetworkSpeedTest from "./components/NetworkSpeedTest";
+import PortIntelligence from "./components/PortIntelligence";
 import { getNetworkOverview, getSystemSnapshot } from "./lib/tauri";
 import type { SystemSnapshot } from "./types/system";
 import type { NetworkOverview } from "./types/network";
 
-type PageId = "dashboard" | "quick_launch" | "network" | "diagnostics" | "projects" | "workspace" | "servers" | "system" | "utilities" | "settings";
+type PageId = "dashboard" | "quick_launch" | "network" | "ports" | "diagnostics" | "projects" | "workspace" | "servers" | "system" | "utilities" | "settings";
 
 interface NavItem {
   id: PageId;
@@ -53,6 +55,7 @@ const navigation: { title: string; items: NavItem[] }[] = [
     title: "NETWORK INTELLIGENCE",
     items: [
       { id: "network", label: "Network monitor", icon: Network },
+      { id: "ports", label: "Port intelligence", icon: Radio, tag: "NEW" },
       { id: "diagnostics", label: "Diagnostics", icon: Gauge, tag: "PHASE 2" },
     ],
   },
@@ -88,6 +91,11 @@ const pageTitles: Record<PageId, { eyebrow: string; title: string; description: 
     eyebrow: "NETWORK INTELLIGENCE",
     title: "Network monitor",
     description: "A dedicated space for connection visibility and network health checks.",
+  },
+  ports: {
+    eyebrow: "NETWORK INTELLIGENCE",
+    title: "Port intelligence",
+    description: "Inspect active local TCP and UDP endpoints and their associated processes.",
   },
   diagnostics: {
     eyebrow: "NETWORK INTELLIGENCE",
@@ -551,6 +559,8 @@ export default function App() {
             />
           ) : activePage === "network" ? (
             <NetworkMonitor />
+          ) : activePage === "ports" ? (
+            <PortIntelligence />
           ) : activePage === "quick_launch" ? (
             <QuickLaunch />
           ) : activePage === "projects" ? (
