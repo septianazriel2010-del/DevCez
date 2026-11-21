@@ -2,6 +2,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 use commands::{
+    deployment::DeploymentManager,
     projects::{load_projects, ProjectStore},
     quick_launch::{load_quick_launch, QuickLaunchStore},
     servers::ServerManager,
@@ -36,6 +37,7 @@ pub fn run() {
             app.manage(QuickLaunchStore::from_load(quick_launch));
             app.manage(ServerManager::default());
             app.manage(SpeedTestManager::default());
+            app.manage(DeploymentManager::default());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -67,13 +69,30 @@ pub fn run() {
             commands::servers::get_local_servers,
             commands::servers::start_local_server,
             commands::servers::stop_local_server,
-            commands::servers::open_local_server_url
+            commands::servers::open_local_server_url,
+            commands::deployment::get_vercel_connection,
+            commands::deployment::connect_vercel,
+            commands::deployment::test_vercel_connection,
+            commands::deployment::disconnect_vercel,
+            commands::deployment::list_vercel_projects,
+            commands::deployment::list_managed_vercel_projects,
+            commands::deployment::inspect_deployment_project,
+            commands::deployment::get_deployment_git_activity,
+            commands::deployment::link_vercel_project,
+            commands::deployment::get_deployment_history,
+            commands::deployment::get_deployment_logs,
+            commands::deployment::deploy_local_project,
+            commands::deployment::start_vercel_deployment,
+            commands::deployment::redeploy_vercel_deployment,
+            commands::deployment::cancel_vercel_deployment,
+            commands::deployment::open_deployment_url
         ])
         .build(tauri::generate_context!())
         .expect("error while building CEZECORE")
         .run(|app_handle, event| {
             if let tauri::RunEvent::Exit = event {
                 app_handle.state::<ServerManager>().stop_all();
+                app_handle.state::<DeploymentManager>().stop_all();
             }
         });
 }

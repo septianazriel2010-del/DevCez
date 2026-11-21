@@ -96,9 +96,14 @@ fn collect_port_overview() -> Result<Vec<PortEndpoint>, String> {
     Err("Port Intelligence is only supported on Windows.".to_string())
 }
 
+#[cfg(any(windows, test))]
+fn network_port(value: u32) -> u16 {
+    u16::from_be(value as u16)
+}
+
 #[cfg(windows)]
 mod windows {
-    use super::{make_endpoint, PortEndpoint, ProcessInfo};
+    use super::{make_endpoint, network_port, PortEndpoint, ProcessInfo};
     use std::{
         collections::HashMap,
         ffi::c_void,
@@ -288,10 +293,6 @@ mod windows {
             .collect())
     }
 
-    fn network_port(value: u32) -> u16 {
-        u16::from_be(value as u16)
-    }
-
     fn format_ipv6(address: [u8; 16], scope_id: u32) -> String {
         let address = Ipv6Addr::from(address);
         if scope_id == 0 {
@@ -399,7 +400,14 @@ mod windows {
 
 #[cfg(test)]
 mod tests {
-    use super::{common_service, make_endpoint, port_classification, ProcessInfo};
+    use super::{common_service, make_endpoint, network_port, port_classification, ProcessInfo};
+
+    #[test]
+    fn decodes_ports_from_network_byte_order() {
+        assert_eq!(network_port(u16::to_be(80) as u32), 80);
+        assert_eq!(network_port(u16::to_be(443) as u32), 443);
+        assert_eq!(network_port(0), 0);
+    }
 
     #[test]
     fn classifies_ports_at_range_boundaries() {
@@ -441,9 +449,31 @@ mod tests {
                 status: "terminated".to_string(),
             },
         );
+        assert_eq!(endpoint.local_port, 5353);
         assert_eq!(endpoint.process_status, "terminated");
         assert_eq!(endpoint.process_name, None);
         assert_eq!(endpoint.remote_address, None);
+        assert_eq!(endpoint.remote_port, None);
+    }
+
+    #[test]
+    fn endpoint_preserves_collected_tcp_port_values() {
+        let endpoint = make_endpoint(
+            "TCP",
+            "0.0.0.0".to_string(),
+            80,
+            Some("0.0.0.0".to_string()),
+            Some(0),
+            "LISTENING".to_string(),
+            4,
+            ProcessInfo {
+                name: None,
+                executable_path: None,
+                status: "unavailable".to_string(),
+            },
+        );
+        assert_eq!(endpoint.local_port, 80);
+        assert_eq!(endpoint.remote_port, Some(0));
     }
 
     #[cfg(windows)]

@@ -6,6 +6,7 @@ import {
   ChevronDown,
   CircleHelp,
   Code2,
+  Cloud,
   Command,
   Cpu,
   FolderKanban,
@@ -33,11 +34,12 @@ import RuntimeInspector from "./components/RuntimeInspector";
 import QuickLaunch from "./components/QuickLaunch";
 import NetworkSpeedTest from "./components/NetworkSpeedTest";
 import PortIntelligence from "./components/PortIntelligence";
+import DeploymentCenter from "./components/DeploymentCenter";
 import { getNetworkOverview, getSystemSnapshot } from "./lib/tauri";
 import type { SystemSnapshot } from "./types/system";
 import type { NetworkOverview } from "./types/network";
 
-type PageId = "dashboard" | "quick_launch" | "network" | "ports" | "diagnostics" | "projects" | "workspace" | "servers" | "system" | "utilities" | "settings";
+type PageId = "dashboard" | "quick_launch" | "network" | "ports" | "diagnostics" | "projects" | "workspace" | "servers" | "deployment" | "system" | "utilities" | "settings";
 
 interface NavItem {
   id: PageId;
@@ -65,6 +67,12 @@ const navigation: { title: string; items: NavItem[] }[] = [
       { id: "projects", label: "My projects", icon: FolderKanban },
       { id: "workspace", label: "Workspace", icon: Code2 },
       { id: "servers", label: "Local servers", icon: Server, tag: "PHASE 3" },
+    ],
+  },
+  {
+    title: "DEPLOYMENT",
+    items: [
+      { id: "deployment", label: "Deployment Center", icon: Cloud, tag: "NEW" },
     ],
   },
   {
@@ -116,6 +124,11 @@ const pageTitles: Record<PageId, { eyebrow: string; title: string; description: 
     eyebrow: "DEVELOPER WORKSPACE",
     title: "Local servers",
     description: "Manage the development servers associated with your projects.",
+  },
+  deployment: {
+    eyebrow: "DEPLOYMENT",
+    title: "Deployment Center",
+    description: "Deploy local projects to Vercel and monitor confirmed deployment and Git activity.",
   },
   system: {
     eyebrow: "SYSTEM INTELLIGENCE",
@@ -569,6 +582,8 @@ export default function App() {
             <WorkspaceManager />
           ) : activePage === "servers" ? (
             <LocalServerManager />
+          ) : activePage === "deployment" ? (
+            <DeploymentCenter />
           ) : activePage === "utilities" ? (
             <RuntimeInspector />
           ) : (

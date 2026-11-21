@@ -117,7 +117,7 @@ export default function PortIntelligence() {
   return (
     <section className="port-intelligence-page">
       <div className="port-overview-grid">
-        <OverviewCard label="TCP CONNECTIONS" value={hasLoaded ? String(tcpConnections) : "—"} caption="Current local TCP table" />
+        <OverviewCard label="TCP ENDPOINTS" value={hasLoaded ? String(tcpConnections) : "—"} caption="Observed rows in the local TCP table" />
         <OverviewCard label="LISTENING TCP" value={hasLoaded ? String(listeningPorts) : "—"} caption="TCP listeners" />
         <OverviewCard label="UDP ENDPOINTS" value={hasLoaded ? String(udpEndpoints) : "—"} caption="Local UDP bindings" />
         <OverviewCard label="IDENTIFIED PROCESSES" value={hasLoaded ? String(identifiedProcesses) : "—"} caption="Unique processes resolved" />
@@ -236,6 +236,7 @@ export default function PortIntelligence() {
                           <td>
                             <span className={`port-process-name ${endpoint.process_name ? "" : "unavailable"}`}>
                               {endpoint.process_name ?? processStatusLabel(endpoint.process_status)}
+                              {endpoint.process_name && <small>{processStatusLabel(endpoint.process_status)}</small>}
                             </span>
                           </td>
                           <td className="port-pid">{endpoint.pid}</td>

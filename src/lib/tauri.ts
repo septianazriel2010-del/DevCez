@@ -12,6 +12,20 @@ import type {
   WorkspaceLaunchResult,
 } from "../types/quickLaunch";
 import type { SpeedTestUpdate } from "../types/speedTest";
+import type {
+  DeploymentEvent,
+  DeploymentLog,
+  DeploymentProjectInfo,
+  DeploymentRecord,
+  DeploymentStartResult,
+  DeploymentTarget,
+  GitActivity,
+  ManagedProject,
+  ProjectLink,
+  VercelAccount,
+  VercelConnection,
+  VercelProject,
+} from "../types/deployment";
 
 /** Requests a fresh system snapshot from the Rust backend. */
 export function getSystemSnapshot(): Promise<SystemSnapshot> {
@@ -155,3 +169,102 @@ export function stopLocalServer(serverId: string): Promise<void> {
 export function openLocalServerUrl(serverId: string): Promise<void> {
   return invoke<void>("open_local_server_url", { serverId });
 }
+
+export function getVercelConnection(): Promise<VercelConnection> {
+  return invoke<VercelConnection>("get_vercel_connection");
+}
+
+export function connectVercel(token: string): Promise<VercelAccount> {
+  return invoke<VercelAccount>("connect_vercel", { token });
+}
+
+export function testVercelConnection(): Promise<VercelAccount> {
+  return invoke<VercelAccount>("test_vercel_connection");
+}
+
+export function disconnectVercel(): Promise<void> {
+  return invoke<void>("disconnect_vercel");
+}
+
+export function listVercelProjects(): Promise<VercelProject[]> {
+  return invoke<VercelProject[]>("list_vercel_projects");
+}
+
+export function listManagedVercelProjects(): Promise<ManagedProject[]> {
+  return invoke<ManagedProject[]>("list_managed_vercel_projects");
+}
+
+export function inspectDeploymentProject(path: string): Promise<DeploymentProjectInfo> {
+  return invoke<DeploymentProjectInfo>("inspect_deployment_project", { path });
+}
+
+export function getDeploymentGitActivity(path: string): Promise<GitActivity> {
+  return invoke<GitActivity>("get_deployment_git_activity", { path });
+}
+
+export function linkVercelProject(
+  path: string,
+  projectId: string,
+  teamId: string | null,
+): Promise<ProjectLink> {
+  return invoke<ProjectLink>("link_vercel_project", { path, projectId, teamId });
+}
+
+export function getDeploymentHistory(
+  projectId: string,
+  teamId: string | null,
+): Promise<DeploymentRecord[]> {
+  return invoke<DeploymentRecord[]>("get_deployment_history", { projectId, teamId });
+}
+
+export function getDeploymentLogs(
+  deploymentId: string,
+  teamId: string | null,
+): Promise<DeploymentLog[]> {
+  return invoke<DeploymentLog[]>("get_deployment_logs", { deploymentId, teamId });
+}
+
+export function startVercelDeployment(
+  path: string,
+  projectId: string,
+  teamId: string | null,
+  target: DeploymentTarget,
+  acknowledgeSensitiveFiles: boolean,
+  productionConfirmed: boolean,
+): Promise<string> {
+  return invoke<string>("start_vercel_deployment", {
+    path,
+    projectId,
+    teamId,
+    target,
+    acknowledgeSensitiveFiles,
+    productionConfirmed,
+  });
+}
+
+export function deployLocalProject(
+  path: string,
+  acknowledgeSensitiveFiles: boolean,
+): Promise<DeploymentStartResult> {
+  return invoke<DeploymentStartResult>("deploy_local_project", {
+    path,
+    acknowledgeSensitiveFiles,
+  });
+}
+
+export function redeployVercelDeployment(
+  deploymentUrl: string,
+  productionConfirmed: boolean,
+): Promise<string> {
+  return invoke<string>("redeploy_vercel_deployment", { deploymentUrl, productionConfirmed });
+}
+
+export function cancelVercelDeployment(): Promise<void> {
+  return invoke<void>("cancel_vercel_deployment");
+}
+
+export function openDeploymentUrl(url: string): Promise<void> {
+  return invoke<void>("open_deployment_url", { url });
+}
+
+export type { DeploymentEvent, DeploymentTarget };

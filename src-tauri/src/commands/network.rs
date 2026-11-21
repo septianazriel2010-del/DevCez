@@ -43,19 +43,17 @@ mod windows {
     use std::mem::size_of;
     use windows_sys::Win32::Foundation::{ERROR_BUFFER_OVERFLOW, ERROR_SUCCESS};
     use windows_sys::Win32::NetworkManagement::IpHelper::{
-        GetAdaptersAddresses, IP_ADAPTER_ADDRESSES_LH, IP_ADAPTER_DNS_SERVER_ADDRESS_XP,
-        IP_ADAPTER_GATEWAY_ADDRESS_LH, IP_ADAPTER_UNICAST_ADDRESS_LH,
-        GAA_FLAG_INCLUDE_GATEWAYS, GAA_FLAG_INCLUDE_PREFIX, GAA_FLAG_SKIP_ANYCAST,
-        GAA_FLAG_SKIP_MULTICAST,
+        GetAdaptersAddresses, GAA_FLAG_INCLUDE_GATEWAYS, GAA_FLAG_INCLUDE_PREFIX,
+        GAA_FLAG_SKIP_ANYCAST, GAA_FLAG_SKIP_MULTICAST, IP_ADAPTER_ADDRESSES_LH,
+        IP_ADAPTER_DNS_SERVER_ADDRESS_XP, IP_ADAPTER_GATEWAY_ADDRESS_LH,
+        IP_ADAPTER_UNICAST_ADDRESS_LH,
     };
     use windows_sys::Win32::NetworkManagement::Ndis::{
-        IfOperStatusDown as IF_OPER_STATUS_DOWN,
-        IfOperStatusDormant as IF_OPER_STATUS_DORMANT,
+        IfOperStatusDormant as IF_OPER_STATUS_DORMANT, IfOperStatusDown as IF_OPER_STATUS_DOWN,
         IfOperStatusLowerLayerDown as IF_OPER_STATUS_LOWER_LAYER_DOWN,
         IfOperStatusNotPresent as IF_OPER_STATUS_NOT_PRESENT,
         IfOperStatusTesting as IF_OPER_STATUS_TESTING,
-        IfOperStatusUnknown as IF_OPER_STATUS_UNKNOWN,
-        IfOperStatusUp as IF_OPER_STATUS_UP,
+        IfOperStatusUnknown as IF_OPER_STATUS_UNKNOWN, IfOperStatusUp as IF_OPER_STATUS_UP,
     };
     use windows_sys::Win32::Networking::WinSock::{
         AF_INET, AF_INET6, AF_UNSPEC, SOCKADDR, SOCKADDR_IN, SOCKADDR_IN6, SOCKET_ADDRESS,
@@ -65,10 +63,10 @@ mod windows {
         unsafe {
             let mut required_size: u32 = 15 * 1024;
             let mut adapters: Vec<IP_ADAPTER_ADDRESSES_LH> = Vec::new();
-            let flags =
-                GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAG_INCLUDE_PREFIX
-                    | GAA_FLAG_SKIP_ANYCAST
-                    | GAA_FLAG_SKIP_MULTICAST;
+            let flags = GAA_FLAG_INCLUDE_GATEWAYS
+                | GAA_FLAG_INCLUDE_PREFIX
+                | GAA_FLAG_SKIP_ANYCAST
+                | GAA_FLAG_SKIP_MULTICAST;
             let mut result = u32::MAX;
 
             for _ in 0..3 {
@@ -131,22 +129,14 @@ mod windows {
                     &mut ipv6_addresses,
                 );
 
-                let mac_address = mac_address(
-                    &adapter.PhysicalAddress,
-                    adapter.PhysicalAddressLength,
-                );
+                let mac_address =
+                    mac_address(&adapter.PhysicalAddress, adapter.PhysicalAddressLength);
 
                 let mut dns_servers = Vec::new();
-                collect_dns_server_addresses(
-                    adapter.FirstDnsServerAddress,
-                    &mut dns_servers,
-                );
+                collect_dns_server_addresses(adapter.FirstDnsServerAddress, &mut dns_servers);
 
                 let mut gateways = Vec::new();
-                collect_gateway_addresses(
-                    adapter.FirstGatewayAddress,
-                    &mut gateways,
-                );
+                collect_gateway_addresses(adapter.FirstGatewayAddress, &mut gateways);
 
                 for gateway in &gateways {
                     if !default_gateways.contains(gateway) {
@@ -299,8 +289,12 @@ mod windows {
             IF_OPER_STATUS_UP => ("Up", "Operational"),
             IF_OPER_STATUS_DOWN => ("Down", "No network connection"),
             IF_OPER_STATUS_DORMANT => ("Dormant", "Waiting for network activity"),
-            IF_OPER_STATUS_LOWER_LAYER_DOWN => ("Down", "Physical or lower-layer connection unavailable"),
-            IF_OPER_STATUS_NOT_PRESENT => ("Disconnected", "Adapter hardware or binding is not present"),
+            IF_OPER_STATUS_LOWER_LAYER_DOWN => {
+                ("Down", "Physical or lower-layer connection unavailable")
+            }
+            IF_OPER_STATUS_NOT_PRESENT => {
+                ("Disconnected", "Adapter hardware or binding is not present")
+            }
             IF_OPER_STATUS_TESTING => ("Testing", "Adapter is running a self-test"),
             IF_OPER_STATUS_UNKNOWN => ("Unknown", "Windows could not determine adapter status"),
             _ => ("Unknown", "Windows returned an unrecognized status"),
@@ -318,7 +312,9 @@ mod windows {
                 break;
             }
         }
-        Some(String::from_utf16_lossy(std::slice::from_raw_parts(value, length)))
+        Some(String::from_utf16_lossy(std::slice::from_raw_parts(
+            value, length,
+        )))
     }
 
     unsafe fn pstr_to_string(value: *const u8) -> Option<String> {

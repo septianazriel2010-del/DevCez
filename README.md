@@ -2,9 +2,9 @@
 
 **Developer & Network Intelligence** · Rust + Tauri 2 + React + TypeScript
 
-This is a complete Phase 1 starter project. It includes the desktop shell, premium dark graphite dashboard, sidebar navigation, Vite/React setup, Tauri 2 configuration, a Rust command that reads a local system snapshot, and a minimal permission capability.
+This project began as the Phase 1 foundation and now includes the desktop shell, local system and network views, developer workspace tools, and a Vercel Deployment Center built with Rust, Tauri 2, React, TypeScript, and Vite.
 
-> Phase 1 scope: application foundation and live CPU/memory/device snapshot. Network diagnostics and developer project management are intentionally marked as upcoming modules; they are not mocked as working features.
+The Deployment Center uses the Vercel API and Vercel CLI for real account and deployment data. It stores the Vercel API token in Windows Credential Manager. After selecting a local folder, CEZECORE validates it, creates or reuses a Vercel Project automatically, associates it with that folder, and starts a Preview deployment without requiring GitHub or manual project linking.
 
 ## 1. Windows prerequisites
 
@@ -66,7 +66,9 @@ Expected result:
 - The dashboard loads with the Premium Dark Graphite theme.
 - CPU, memory, processor thread count, OS, and device name are requested from the Rust backend.
 - The dashboard refreshes the system snapshot every six seconds.
-- Sidebar pages navigate between the dashboard and the upcoming module placeholders.
+- Sidebar pages include the existing network, port, workspace, and deployment tools.
+
+To deploy from Deployment Center, install the Vercel CLI (`npm install --global vercel`) and connect using your own Vercel API token. CEZECORE locates the CLI from `where.exe`, validates its version, and checks the project type, manifest, dependencies, build command, and runtime before enabling deployment. Local folder-to-project associations are persisted in CEZECORE application data and verified against Vercel before reuse. Environment-file contents are never read; uploads containing detected sensitive filenames require explicit acknowledgment.
 
 The first Rust build can take longer because Cargo needs to download and compile dependencies.
 

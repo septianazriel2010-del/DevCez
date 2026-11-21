@@ -1,3 +1,4 @@
+pub mod deployment;
 pub mod network;
 pub mod ports;
 pub mod projects;
